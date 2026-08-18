@@ -1,0 +1,14 @@
+.modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: -1; /* Уходит на задний план, когда скрыта */
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      z-index: 9999; /* Выходит на передний план при открытии */
+    }
