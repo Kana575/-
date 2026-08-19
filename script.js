@@ -1,38 +1,3 @@
-const staticData = [
-    {
-        type: "вакансия",
-        source: "ООН",
-        title: "Project Assistant (Youth Opportunities)",
-        summary: "Поддержка молодежных программ, организация семинаров и координация с региональными партнерами.",
-        date: "Август 2026",
-        link: "https://careers.un.org"
-    },
-    {
-        type: "грант",
-        source: "Youth Grants Fund",
-        title: "International Youth Initiative Award 2026",
-        summary: "Грантовая поддержка студенческих и социальных проектов по всему миру.",
-        date: "Август 2026",
-        link: "https://un.org"
-    },
-    {
-        type: "мероприятие",
-        source: "UN Volunteers",
-        title: "Молодежный онлайн-форум по устойчивому развитию",
-        summary: "Серия воркшопов, лекций и нетворкинг-сессий с экспертами международной дипломатии.",
-        date: "Сентябрь 2026",
-        link: "https://unv.org"
-    }
-];
-
-let allOpportunities = [...staticData];
-
-document.addEventListener("DOMContentLoaded", () => {
-    renderCards(allOpportunities);
-    setupSearchAndFilters();
-    setupUpdateTrigger();
-});
-
 function renderCards(items) {
     const container = document.getElementById("cards-container");
     if (!container) return;
@@ -48,8 +13,16 @@ function renderCards(items) {
         const card = document.createElement("article");
         card.className = "card";
 
-        // Формирование ссылки для делиться в LinkedIn
+        // LinkedIn Share URL (открывает окно создания поста)
         const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(item.link)}`;
+
+        // Готовый текст для публикации
+        const postText = `📌 Новая возможность: ${item.title}\n\n` +
+                         `🏢 Организация: ${item.source}\n` +
+                         `🏷 Тип: ${item.type.toUpperCase()}\n` +
+                         `📝 Описание: ${item.summary}\n\n` +
+                         `🔗 Подробнее и подача заявки: ${item.link}\n\n` +
+                         `#YouthOpportunities #Opportunity #Career #Youth #Grant #Jobs`;
 
         card.innerHTML = `
             <div class="card-header">
@@ -61,9 +34,9 @@ function renderCards(items) {
             <div class="card-footer">
                 <span class="date">${item.date}</span>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <a href="${linkedinUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-linkedin">
+                    <button class="btn btn-linkedin" onclick="shareToLinkedin('${encodeURIComponent(postText)}', '${linkedinUrl}')">
                         Пост в LinkedIn
-                    </a>
+                    </button>
                     <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="btn">Подробнее</a>
                 </div>
             </div>
@@ -72,72 +45,16 @@ function renderCards(items) {
     });
 }
 
-function setupSearchAndFilters() {
-    const searchInput = document.getElementById('search-input');
-    const filterButtons = document.querySelectorAll('.filter-chip');
-
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            const filtered = allOpportunities.filter(item => 
-                (item.title && item.title.toLowerCase().includes(query)) || 
-                (item.summary && item.summary.toLowerCase().includes(query))
-            );
-            renderCards(filtered);
-        });
-    }
-
-    filterButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            const category = btn.getAttribute('data-category').toLowerCase();
-            if (category === 'all') {
-                renderCards(allOpportunities);
-            } else {
-                const filtered = allOpportunities.filter(item => 
-                    item.type && item.type.toLowerCase().includes(category)
-                );
-                renderCards(filtered);
-            }
-        });
-    });
-}
-
-function setupUpdateTrigger() {
-    const updateBtn = document.getElementById('update-btn');
-    if (!updateBtn) return;
-
-    updateBtn.addEventListener('click', async () => {
-        updateBtn.disabled = true;
-        const originalText = updateBtn.innerText;
-        updateBtn.innerText = '⏳ Поиск вакансий...';
-
-        try {
-            // Подгружаем свежие вакансии через публичный API
-            const res = await fetch("https://remotive.com/api/remote-jobs?limit=4");
-            const data = await res.json();
-            
-            const newJobs = data.jobs.map(j => ({
-                type: "вакансия",
-                source: j.company_name || "Global",
-                title: j.title,
-                summary: `Локация: ${j.candidate_required_location || 'Remote'}. Опубликовано на Remotive.`,
-                date: "Свежая",
-                link: j.url
-            }));
-
-            allOpportunities = [...newJobs, ...staticData];
-            renderCards(allOpportunities);
-            updateBtn.innerText = '✅ Найдено новые!';
-        } catch (e) {
-            updateBtn.innerText = '✅ Все данные актуальны';
-        }
-
-        setTimeout(() => {
-            updateBtn.disabled = false;
-            updateBtn.innerText = originalText;
-        }, 2500);
+// Функция копирования готового текста и перехода в LinkedIn
+function shareToLinkedin(encodedText, shareUrl) {
+    const text = decodeURIComponent(encodedText);
+    
+    // Копируем готовый пост в буфер обмена
+    navigator.clipboard.writeText(text).then(() => {
+        alert("📋 Готовый текст поста скопирован в буфер обмена!\n\nПросто нажмите Ctrl+V в окне LinkedIn, чтобы вставить текст.");
+        window.open(shareUrl, '_blank');
+    }).catch(err => {
+        // Резервный вариант, если браузер заблокировал доступ к буферу
+        window.open(shareUrl, '_blank');
     });
 }
