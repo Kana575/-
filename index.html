@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Youth Opportunities Hub</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- Добавлен ?v=2 чтобы браузер мгновенно обновил CSS -->
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
     <header class="header">
@@ -24,7 +25,7 @@
         <div class="controls">
             <div class="search-box">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="search-input" placeholder="Поиск по название или описанию...">
+                <input type="text" id="search-input" placeholder="Поиск по названию или описанию...">
             </div>
             <div class="filters">
                 <button class="filter-chip active" data-category="all">Все</button>
@@ -35,10 +36,11 @@
         </div>
 
         <div id="cards-container" class="cards-grid">
-            <!-- Карточки выводятся через JS -->
+            <!-- Карточки генерируются через JS -->
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <!-- Добавлен ?v=2 чтобы браузер мгновенно обновил JS -->
+    <script src="script.js?v=2"></script>
 </body>
 </html>
