@@ -1,189 +1,134 @@
+// Переменные для хранения данных
+let allOpportunities = [];
+
 document.addEventListener("DOMContentLoaded", () => {
+    loadOpportunities();
+    setupSearchAndFilters();
+    setupUpdateTrigger();
+});
+
+// 1. Загрузка данных из data.json
+async function loadOpportunities() {
     const container = document.getElementById("cards-container");
+    try {
+        const response = await fetch("data.json");
+        if (!response.ok) throw new Error("Файл data.json не найден");
+        
+        allOpportunities = await response.json();
+        renderCards(allOpportunities);
+    } catch (error) {
+        console.error("Ошибка загрузки:", error);
+        if (container) {
+            container.innerHTML = `<p style="color: #666; text-align: center; padding: 2rem;">
+                Данные загружаются или парсер еще не сгенерировал data.json.
+            </p>`;
+        }
+    }
+}
 
-    // Загрузка JSON, сгенерированного Python-скриптом
-    fetch("data.json")
-        .then(response => {
-            if (!response.ok) throw new Error("Данные еще не созданы");
-            return response.json();
-        })
-        .then(data => {
-            container.innerHTML = "";
-            if (data.length === 0) {
-                container.innerHTML = "<p>Актуальных возможностей пока нет.</p>";
-                return;
-            }
+// 2. Отрисовка карточек на странице
+function renderCards(items) {
+    const container = document.getElementById("cards-container");
+    if (!container) return;
 
-            data.forEach(item => {
-                const card = document.createElement("article");
-                card.className = "card";
-                card.innerHTML = `
-                    <h2>${item.title}</h2>
-                    <p>${item.summary}...</p>
-                    <div class="card-footer">
-                        <span class="date">${item.date}</span>
-                        <a href="${item.link}" target="_blank" class="btn">Подробнее</a>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        })
-        .catch(err => {
-            container.innerHTML = `<p style="color:red;">Запустите Python-скрипт для генерации данных (data.json).</p>`;
+    container.innerHTML = "";
+
+    if (items.length === 0) {
+        container.innerHTML = `<p style="text-align: center; color: #777; padding: 2rem;">Ничего не найдено</p>`;
+        return;
+    }
+
+    items.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.innerHTML = `
+            <div class="card-header">
+                <span class="badge">${item.type || 'ВАКАНСИЯ'}</span>
+                <span class="source">🌐 ${item.source || 'Международная организация'}</span>
+            </div>
+            <h2>${item.title}</h2>
+            <p>${item.summary}...</p>
+            <div class="card-footer">
+                <span class="date">${item.date || 'Недавно'}</span>
+                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="btn">Подробнее</a>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// 3. Быстрый поиск и фильтрация по категориям (без перезагрузки страницы)
+function setupSearchAndFilters() {
+    const searchInput = document.querySelector('input[type="text"]') || document.querySelector('.search-input');
+    const filterButtons = document.querySelectorAll('.category-btn, .filter-btn');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            const filtered = allOpportunities.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                item.summary.toLowerCase().includes(query)
+            );
+            renderCards(filtered);
         });
-});      url: "https://www.linkedin.com",
-      hashtags: "#Гранты #Аналитика #Дипломатия #МеждународныеОтношения"
-    }
-  ];
-
-  const cardsGrid = document.getElementById('cardsGrid');
-  const searchInput = document.getElementById('searchInput');
-  const filterChips = document.querySelectorAll('.filter-chip');
-  const postModal = document.getElementById('postModal');
-  const linkedinPostText = document.getElementById('linkedinPostText');
-  const closeModal = document.getElementById('closeModal');
-  const copyPostBtn = document.getElementById('copyPostBtn');
-  const fetchBtn = document.getElementById('fetchBtn');
-
-  let currentFilter = 'all';
-
-  function renderCards() {
-    cardsGrid.innerHTML = '';
-    const query = searchInput.value.toLowerCase();
-    
-    const filtered = opportunities.filter(item => {
-      const matchesFilter = currentFilter === 'all' || item.type === currentFilter;
-      const matchesSearch = item.title.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query);
-      return matchesFilter && matchesSearch;
-    });
-
-    if (filtered.length === 0) {
-      cardsGrid.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">Ничего не найдено</p>';
-      return;
     }
 
-    filtered.forEach(item => {
-      const card = document.createElement('article');
-      card.className = 'opp-card';
-      card.innerHTML = `
-        <div class="card-top">
-          <span class="badge ${item.type}">${item.typeLabel}</span>
-          <span class="source-tag">🌐 ${item.source}</span>
-        </div>
-        <h2 class="card-title">${item.title}</h2>
-        <p class="card-desc">${item.desc}</p>
-        <div class="card-meta">
-          <span>👤 Возраст: ${item.age}</span>
-          <span>📍 ${item.location}</span>
-        </div>
-        <div class="card-actions">
-          <button class="action-btn secondary-btn" data-post-id="${item.id}">📲 Пост для LinkedIn</button>
-          <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="action-btn primary-btn">Источник</a>
-        </div>
-      `;
-      cardsGrid.appendChild(card);
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const category = btn.textContent.trim().toLowerCase();
+            if (category.includes('все')) {
+                renderCards(allOpportunities);
+            } else {
+                const filtered = allOpportunities.filter(item => 
+                    (item.type && item.type.toLowerCase().includes(category)) ||
+                    item.title.toLowerCase().includes(category)
+                );
+                renderCards(filtered);
+            }
+        });
     });
+}
 
-    document.querySelectorAll('[data-post-id]').forEach(btn => {
-      btn.onclick = (e) => {
-        const id = parseInt(e.target.getAttribute('data-post-id'));
-        openPostModal(id);
-      };
+// 4. Логика кнопки "Поиск обновлений"
+function setupUpdateTrigger() {
+    const updateBtn = document.querySelector('.search-btn') || document.querySelector('#update-btn');
+    if (!updateBtn) return;
+
+    updateBtn.addEventListener('click', async () => {
+        // Замените на сгенерированный токен
+        const token = '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';
+        const owner = 'Kana575';
+        const repo = '-'; // Название вашего репозитория на GitHub
+
+        updateBtn.disabled = true;
+        const originalText = updateBtn.innerText;
+        updateBtn.innerText = 'Запуск парсера...';
+
+        try {
+            const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/workflows/main.yml/dispatches`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ref: 'main' })
+            });
+
+            if (response.ok) {
+                alert(' Поиск запущен на сервере GitHub! Новые вакансии и гранты появятся на сайте через 1–2 минуты.');
+            } else {
+                alert(' Не удалось запустить обновление. Проверьте настройки репозитория.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Ошибка сети при отправке запроса.');
+        } finally {
+            updateBtn.disabled = false;
+            updateBtn.innerText = originalText;
+        }
     });
-  }
-
-  function openPostModal(id) {
-    const item = opportunities.find(o => o.id === id);
-    if (!item) return;
-
-    linkedinPostText.value = `📢 ВОЗМОЖНОСТЬ ДЛЯ МОЛОДЕЖИ (16-35 ЛЕТ)\n\n📌 ${item.title}\n\n📍 Локация: ${item.location}\n👥 Возраст: ${item.age}\n🌐 Источник: ${item.source}\n\n📝 Описание:\n${item.desc}\n\n🔗 Ссылка на источник в комментариях или описании.\n\n${item.hashtags} #YouthOpportunities`;
-
-    postModal.showModal();
-  }
-
-  filterChips.forEach(chip => {
-    chip.onclick = function() {
-      filterChips.forEach(c => c.classList.remove('active'));
-      this.classList.add('active');
-      currentFilter = this.getAttribute('data-filter');
-      renderCards();
-    };
-  });
-
-  searchInput.oninput = renderCards;
-
-  if (closeModal) {
-    closeModal.onclick = () => postModal.close();
-  }
-
-  if (postModal) {
-    postModal.onclick = (e) => {
-      if (e.target === postModal) postModal.close();
-    };
-  }
-
-  if (copyPostBtn) {
-    copyPostBtn.onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(linkedinPostText.value);
-        alert('Текст поста скопирован в буфер обмена!');
-        postModal.close();
-      } catch (err) {
-        linkedinPostText.select();
-        document.execCommand('copy');
-        alert('Текст скопирован!');
-        postModal.close();
-      }
-    };
-  }
-
-  // Реальная отрисовка новых данных при нажатии кнопки
-  fetchBtn.onclick = () => {
-    fetchBtn.disabled = true;
-    fetchBtn.innerText = "⏳ Поиск новых возможностей...";
-
-    setTimeout(() => {
-      const existingIds = new Set(opportunities.map(o => o.id));
-      const itemsToAdd = newIncomingData.filter(item => !existingIds.has(item.id));
-
-      if (itemsToAdd.length > 0) {
-        opportunities = [...itemsToAdd, ...opportunities];
-        renderCards();
-      } else {
-        alert("Новых карточек пока нет, списки актуальны.");
-      }
-
-      fetchBtn.disabled = false;
-      fetchBtn.innerText = "⚡ Поиск обновлений";
-    }, 1200);
-  };
-
-  renderCards();
-});      desc: "Стипендия для молодых исследователей в области публичной дипломатии и аналитики.",
-      url: "https://www.linkedin.com",
-      hashtags: "#Аналитика #Дипломатия #Гранты"
-    }
-  ];
-
-  fetchBtn.onclick = () => {
-    fetchBtn.disabled = true;
-    fetchBtn.innerText = "⌛ Загрузка...";
-
-    // Имитация задержки сети в 1.5 секунды
-    setTimeout(() => {
-      // Проверка, чтобы не добавлять дубли
-      const existingIds = new Set(opportunities.map(o => o.id));
-      const itemsToAdd = newItems.filter(item => !existingIds.has(item.id));
-
-      if (itemsToAdd.length > 0) {
-        opportunities = [...itemsToAdd, ...opportunities];
-        renderCards();
-        alert(`Найдено и добавлено новых возможностей: ${itemsToAdd.length}!`);
-      } else {
-        alert("Новых возможностей пока не найдено, база актуальна.");
-      }
-
-      fetchBtn.disabled = false;
-      fetchBtn.innerText = "⚡ Поиск обновлений";
-    }, 1500);
-  };
+}
