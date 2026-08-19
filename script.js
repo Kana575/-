@@ -1,17 +1,10 @@
-const initialData = [
-    {
-        type: "вакансия",
-        source: "ООН",
-        title: "Project Assistant (Youth Opportunities)",
-        summary: "Поддержка молодежных программ, организация семинаров и координация с региональными партнерами.",
-        date: "Август 2026",
-        link: "https://careers.un.org"
-    },
+// Базовый набор возможностей (гранты и мероприятия)
+const staticData = [
     {
         type: "грант",
-        source: "Youth Grants",
+        source: "Youth Grants Fund",
         title: "International Youth Initiative Award 2026",
-        summary: "Грантовая поддержка студенческих и социальных проектов по всему миру.",
+        summary: "Грантовая поддержка студенческих и социальных проектов по всему миру до $10,000.",
         date: "Август 2026",
         link: "https://un.org"
     },
@@ -25,24 +18,37 @@ const initialData = [
     }
 ];
 
-let allOpportunities = [];
+let allOpportunities = [...staticData];
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadOpportunities();
+    fetchLiveJobs(); // Загрузка свежих вакансий при старте
     setupSearchAndFilters();
     setupUpdateTrigger();
 });
 
-async function loadOpportunities() {
+// Загрузка реальных вакансий через открытый API
+async function fetchLiveJobs() {
     try {
-        const response = await fetch("data.json?cache=" + Math.random());
-        if (!response.ok) throw new Error("Файл data.json недоступен");
-        allOpportunities = await response.json();
+        const response = await fetch("https://remotive.com/api/remote-jobs?limit=5");
+        if (!response.ok) throw new Error("Ошибка API");
+        const data = await response.json();
+        
+        const apiJobs = data.jobs.map(job => ({
+            type: "вакансия",
+            source: job.company_name || "Remote Job",
+            title: job.title,
+            summary: job.candidate_required_location ? `Локация: ${job.candidate_required_location}. Нажмите «Подробнее» для просмотра полного описания.` : "Удаленная работа для специалистов.",
+            date: "Свежая",
+            link: job.url
+        }));
+
+        // Объединяем свежие вакансии с грантами и мероприятиями
+        allOpportunities = [...apiJobs, ...staticData];
     } catch (error) {
-        console.warn("Использован базовый список:", error);
-        allOpportunities = initialData;
+        console.warn("API недоступен, загружены локальные данные:", error);
+    } finally {
+        renderCards(allOpportunities);
     }
-    renderCards(allOpportunities);
 }
 
 function renderCards(items) {
@@ -59,24 +65,24 @@ function renderCards(items) {
     items.forEach(item => {
         const card = document.createElement("article");
         card.className = "card";
-        
-        // Генерация ссылки для репоста в LinkedIn
-        const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(item.link || window.location.href)}`;
+
+        // Формирование ссылки для публикации в LinkedIn
+        const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(item.link)}`;
 
         card.innerHTML = `
             <div class="card-header">
-                <span class="badge">${item.type || 'ВАКАНСИЯ'}</span>
-                <span class="source">🌐 ${item.source || 'Источник'}</span>
+                <span class="badge">${item.type.toUpperCase()}</span>
+                <span class="source">🌐 ${item.source}</span>
             </div>
-            <h2>${item.title || ''}</h2>
-            <p>${item.summary || ''}</p>
+            <h2>${item.title}</h2>
+            <p>${item.summary}</p>
             <div class="card-footer">
-                <span class="date">${item.date || 'Недавно'}</span>
+                <span class="date">${item.date}</span>
                 <div style="display: flex; gap: 8px;">
-                    <a href="${linkedinUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="background-color: #0a66c2; border-color: #0a66c2;">
-                        🔗 LinkedIn
+                    <a href="${linkedinUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-linkedin">
+                        Пост в LinkedIn
                     </a>
-                    <a href="${item.link || '#'}" target="_blank" rel="noopener noreferrer" class="btn">Подробнее</a>
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="btn">Подробнее</a>
                 </div>
             </div>
         `;
@@ -124,16 +130,14 @@ function setupUpdateTrigger() {
     updateBtn.addEventListener('click', async () => {
         updateBtn.disabled = true;
         const originalText = updateBtn.innerText;
-        updateBtn.innerText = '⏳ Поиск...';
+        updateBtn.innerText = '⏳ Поиск вакансий...';
 
-        // Имитация/вызов обновления данных
-        setTimeout(async () => {
-            await loadOpportunities();
-            updateBtn.innerText = '✅ Обновлено';
-            setTimeout(() => {
-                updateBtn.disabled = false;
-                updateBtn.innerText = originalText;
-            }, 2000);
-        }, 1200);
+        await fetchLiveJobs();
+
+        updateBtn.innerText = '✅ Данные обновлены!';
+        setTimeout(() => {
+            updateBtn.disabled = false;
+            updateBtn.innerText = originalText;
+        }, 2000);
     });
 }
