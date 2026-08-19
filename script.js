@@ -1,4 +1,3 @@
-// Базовый список возможностей, если файл data.json недоступен
 const initialData = [
     {
         type: "вакансия",
@@ -40,7 +39,7 @@ async function loadOpportunities() {
         if (!response.ok) throw new Error("Файл data.json недоступен");
         allOpportunities = await response.json();
     } catch (error) {
-        console.warn("Загружен базовый список:", error);
+        console.warn("Использован базовый список:", error);
         allOpportunities = initialData;
     }
     renderCards(allOpportunities);
@@ -60,6 +59,10 @@ function renderCards(items) {
     items.forEach(item => {
         const card = document.createElement("article");
         card.className = "card";
+        
+        // Генерация ссылки для репоста в LinkedIn
+        const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(item.link || window.location.href)}`;
+
         card.innerHTML = `
             <div class="card-header">
                 <span class="badge">${item.type || 'ВАКАНСИЯ'}</span>
@@ -69,7 +72,12 @@ function renderCards(items) {
             <p>${item.summary || ''}</p>
             <div class="card-footer">
                 <span class="date">${item.date || 'Недавно'}</span>
-                <a href="${item.link || '#'}" target="_blank" rel="noopener noreferrer" class="btn">Подробнее</a>
+                <div style="display: flex; gap: 8px;">
+                    <a href="${linkedinUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="background-color: #0a66c2; border-color: #0a66c2;">
+                        🔗 LinkedIn
+                    </a>
+                    <a href="${item.link || '#'}" target="_blank" rel="noopener noreferrer" class="btn">Подробнее</a>
+                </div>
             </div>
         `;
         container.appendChild(card);
@@ -113,7 +121,19 @@ function setupUpdateTrigger() {
     const updateBtn = document.getElementById('update-btn');
     if (!updateBtn) return;
 
-    updateBtn.addEventListener('click', () => {
-        alert('Обновление выполняется автоматически через GitHub Actions каждый день!');
+    updateBtn.addEventListener('click', async () => {
+        updateBtn.disabled = true;
+        const originalText = updateBtn.innerText;
+        updateBtn.innerText = '⏳ Поиск...';
+
+        // Имитация/вызов обновления данных
+        setTimeout(async () => {
+            await loadOpportunities();
+            updateBtn.innerText = '✅ Обновлено';
+            setTimeout(() => {
+                updateBtn.disabled = false;
+                updateBtn.innerText = originalText;
+            }, 2000);
+        }, 1200);
     });
 }
