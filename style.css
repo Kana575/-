@@ -125,7 +125,7 @@ body {
     border: 1px solid var(--border);
 }
 
-.card-top {
+.card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -138,16 +138,14 @@ body {
     padding: 4px 10px;
     border-radius: 12px;
     text-transform: uppercase;
+    background: var(--vacancy-bg);
+    color: var(--vacancy-color);
 }
 
-.badge.vacancy { background: var(--vacancy-bg); color: var(--vacancy-color); }
-.badge.grant { background: var(--grant-bg); color: var(--grant-color); }
-.badge.event { background: var(--event-bg); color: var(--event-color); }
+.source { font-size: 0.8rem; color: var(--text-muted); }
 
-.source-tag { font-size: 0.8rem; color: var(--text-muted); }
-
-.card-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
-.card-desc { font-size: 0.92rem; color: #444; margin-bottom: 16px; }
+.card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+.card p { font-size: 0.92rem; color: #444; margin-bottom: 16px; }
 
 .card-footer {
     display: flex;
@@ -157,9 +155,9 @@ body {
     border-top: 1px solid var(--bg-color);
 }
 
-.date-tag { font-size: 0.82rem; color: var(--text-muted); }
+.date { font-size: 0.82rem; color: var(--text-muted); }
 
-.action-btn {
+.btn {
     padding: 8px 16px;
     border-radius: 20px;
     text-decoration: none;
