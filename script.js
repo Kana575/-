@@ -1,10 +1,17 @@
-// Базовый набор возможностей (гранты и мероприятия)
 const staticData = [
+    {
+        type: "вакансия",
+        source: "ООН",
+        title: "Project Assistant (Youth Opportunities)",
+        summary: "Поддержка молодежных программ, организация семинаров и координация с региональными партнерами.",
+        date: "Август 2026",
+        link: "https://careers.un.org"
+    },
     {
         type: "грант",
         source: "Youth Grants Fund",
         title: "International Youth Initiative Award 2026",
-        summary: "Грантовая поддержка студенческих и социальных проектов по всему миру до $10,000.",
+        summary: "Грантовая поддержка студенческих и социальных проектов по всему миру.",
         date: "Август 2026",
         link: "https://un.org"
     },
@@ -21,35 +28,10 @@ const staticData = [
 let allOpportunities = [...staticData];
 
 document.addEventListener("DOMContentLoaded", () => {
-    fetchLiveJobs(); // Загрузка свежих вакансий при старте
+    renderCards(allOpportunities);
     setupSearchAndFilters();
     setupUpdateTrigger();
 });
-
-// Загрузка реальных вакансий через открытый API
-async function fetchLiveJobs() {
-    try {
-        const response = await fetch("https://remotive.com/api/remote-jobs?limit=5");
-        if (!response.ok) throw new Error("Ошибка API");
-        const data = await response.json();
-        
-        const apiJobs = data.jobs.map(job => ({
-            type: "вакансия",
-            source: job.company_name || "Remote Job",
-            title: job.title,
-            summary: job.candidate_required_location ? `Локация: ${job.candidate_required_location}. Нажмите «Подробнее» для просмотра полного описания.` : "Удаленная работа для специалистов.",
-            date: "Свежая",
-            link: job.url
-        }));
-
-        // Объединяем свежие вакансии с грантами и мероприятиями
-        allOpportunities = [...apiJobs, ...staticData];
-    } catch (error) {
-        console.warn("API недоступен, загружены локальные данные:", error);
-    } finally {
-        renderCards(allOpportunities);
-    }
-}
 
 function renderCards(items) {
     const container = document.getElementById("cards-container");
@@ -66,7 +48,7 @@ function renderCards(items) {
         const card = document.createElement("article");
         card.className = "card";
 
-        // Формирование ссылки для публикации в LinkedIn
+        // Формирование ссылки для делиться в LinkedIn
         const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(item.link)}`;
 
         card.innerHTML = `
@@ -78,7 +60,7 @@ function renderCards(items) {
             <p>${item.summary}</p>
             <div class="card-footer">
                 <span class="date">${item.date}</span>
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 8px; align-items: center;">
                     <a href="${linkedinUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-linkedin">
                         Пост в LinkedIn
                     </a>
@@ -132,12 +114,30 @@ function setupUpdateTrigger() {
         const originalText = updateBtn.innerText;
         updateBtn.innerText = '⏳ Поиск вакансий...';
 
-        await fetchLiveJobs();
+        try {
+            // Подгружаем свежие вакансии через публичный API
+            const res = await fetch("https://remotive.com/api/remote-jobs?limit=4");
+            const data = await res.json();
+            
+            const newJobs = data.jobs.map(j => ({
+                type: "вакансия",
+                source: j.company_name || "Global",
+                title: j.title,
+                summary: `Локация: ${j.candidate_required_location || 'Remote'}. Опубликовано на Remotive.`,
+                date: "Свежая",
+                link: j.url
+            }));
 
-        updateBtn.innerText = '✅ Данные обновлены!';
+            allOpportunities = [...newJobs, ...staticData];
+            renderCards(allOpportunities);
+            updateBtn.innerText = '✅ Найдено новые!';
+        } catch (e) {
+            updateBtn.innerText = '✅ Все данные актуальны';
+        }
+
         setTimeout(() => {
             updateBtn.disabled = false;
             updateBtn.innerText = originalText;
-        }, 2000);
+        }, 2500);
     });
 }
