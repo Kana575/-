@@ -7,314 +7,37 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
+
+    <header class="navbar">
         <div class="brand">
-            <h1>Youth Opportunities Hub</h1>
-            <p>Гранты, вакансии и мероприятия (16–35 лет)</p>
+            <span class="logo">🎯</span>
+            <div>
+                <h1>Youth Opportunities Hub</h1>
+                <p>Гранты, вакансии и мероприятия для молодежи (16–35 лет)</p>
+            </div>
         </div>
-        <button id="update-btn" class="search-btn">⚡ Поиск обновлений</button>
+        <button id="update-btn" class="fetch-btn">⚡ Поиск обновлений</button>
     </header>
 
     <main class="container">
-        <div class="filter-section">
-            <input type="text" class="search-input" placeholder="Поиск по названию или описанию...">
-            <div class="filter-group">
-                <button class="filter-btn active">Все</button>
-                <button class="filter-btn">💼 Вакансии</button>
-                <button class="filter-btn">🎓 Гранты</button>
-                <button class="filter-btn">🌍 Мероприятия</button>
+        <section class="filter-section">
+            <div class="search-box">
+                <input type="text" id="search-input" class="search-input" placeholder="🔍 Поиск по названию или описанию...">
             </div>
-        </div>
+            
+            <div class="filter-group">
+                <button class="filter-chip active" data-category="all">Все</button>
+                <button class="filter-chip" data-category="вакансия">💼 Вакансии</button>
+                <button class="filter-chip" data-category="грант">🎓 Гранты</button>
+                <button class="filter-chip" data-category="мероприятие">🌍 Мероприятия</button>
+            </div>
+        </section>
 
-        <div id="cards-container" class="cards-grid">
-            <!-- Карточки будут загружаться сюда -->
-        </div>
+        <section id="cards-container" class="cards-grid">
+            <p class="loading-text">Загрузка актуальных возможностей...</p>
+        </section>
     </main>
 
     <script src="script.js"></script>
-</body>
-</html>
-    .filter-chip {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .filter-chip.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    .cards-grid { display: flex; flex-direction: column; gap: 16px; }
-
-    .opp-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 20px;
-      border: 1px solid var(--border);
-    }
-
-    .card-top { display: flex; justify-content: space-between; margin-bottom: 12px; }
-
-    .badge {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 12px;
-      text-transform: uppercase;
-    }
-
-    .badge.grant { background: var(--grant-bg); color: var(--grant-color); }
-    .badge.vacancy { background: var(--vacancy-bg); color: var(--vacancy-color); }
-    .badge.event { background: var(--event-bg); color: var(--event-color); }
-
-    .source-tag { font-size: 0.8rem; color: var(--text-muted); }
-    .card-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
-    .card-desc { font-size: 0.92rem; color: #444; line-height: 1.5; margin-bottom: 16px; }
-
-    .card-meta {
-      display: flex;
-      gap: 15px;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-    }
-
-    .card-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 12px;
-      border-top: 1px solid #f0f0f0;
-    }
-
-    .action-btn {
-      padding: 8px 16px;
-      border-radius: 20px;
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .primary-btn { background: var(--primary); color: white; border: none; }
-    .secondary-btn { background: #f0f4f9; color: var(--primary); border: none; }
-
-    /* Жесткое скрытие невидимого слоя */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-
-    .modal {
-      background: white;
-      width: 90%;
-      max-width: 500px;
-      padding: 20px;
-      border-radius: 16px;
-    }
-
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-
-    textarea {
-      width: 100%; height: 180px; padding: 10px;
-      border-radius: 8px; border: 1px solid var(--border);
-      font-size: 0.9rem; resize: none; margin-bottom: 12px;
-    }
-
-    .copy-btn {
-      width: 100%; padding: 10px;
-      background: var(--primary); color: white;
-      border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="app-container">
-    <header class="app-header">
-      <div class="brand">
-        <span class="logo">🎯</span>
-        <div>
-          <h1>Youth Opportunities Hub</h1>
-          <p>Гранты, вакансии и мероприятия (16–35 лет)</p>
-        </div>
-      </div>
-      <button class="fetch-btn" id="fetchBtn">⚡ Поиск обновлений</button>
-    </header>
-
-    <section class="filter-section">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Поиск по названию или описанию...">
-      </div>
-      
-      <div class="filter-group">
-        <button class="filter-chip active" data-filter="all">Все</button>
-        <button class="filter-chip" data-filter="vacancy">💼 Вакансии</button>
-        <button class="filter-chip" data-filter="grant">🎓 Гранты</button>
-        <button class="filter-chip" data-filter="event">🌍 Мероприятия</button>
-      </div>
-    </section>
-
-    <main class="cards-grid" id="cardsGrid"></main>
-
-    <div class="modal-overlay" id="modalOverlay">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Готовый пост для LinkedIn 🚀</h3>
-          <button class="close-btn" id="closeModal">&times;</button>
-        </div>
-        <textarea id="linkedinPostText" readonly></textarea>
-        <div class="modal-actions">
-          <button class="copy-btn" id="copyPostBtn">📋 Скопировать текст</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const opportunities = [
-      {
-        id: 1,
-        title: "Стажировка в ООН (UN Volunteers)",
-        type: "vacancy",
-        typeLabel: "Вакансия",
-        source: "Официальный сайт ООН",
-        age: "18-35 лет",
-        location: "Гибрид / Международный",
-        desc: "Программа профессиональных стажировок в международных отделах для молодых специалистов.",
-        url: "https://www.un.org",
-        hashtags: "#ООН #Стажировка #Молодежь #Карьера"
-      },
-      {
-        id: 2,
-        title: "Грант на социальные инициативы",
-        type: "grant",
-        typeLabel: "Грант",
-        source: "Международный фонд",
-        age: "16-30 лет",
-        location: "Онлайн",
-        desc: "Финансирование до $5,000 на реализацию образовательных и экологических проектов.",
-        url: "https://www.linkedin.com",
-        hashtags: "#Гранты #МолодежныеИнициативы #Финансирование"
-      },
-      {
-        id: 3,
-        title: "Международный Саммит Лидеров",
-        type: "event",
-        typeLabel: "Мероприятие",
-        source: "LinkedIn / Соцсети",
-        age: "16-35 лет",
-        location: "Вена / Онлайн",
-        desc: "Форум с участием экспертов международных организаций, нетворкинг и воркшопы.",
-        url: "https://www.linkedin.com",
-        hashtags: "#Саммит #Лидерство #Нетворкинг"
-      }
-    ];
-
-    const cardsGrid = document.getElementById('cardsGrid');
-    const searchInput = document.getElementById('searchInput');
-    const filterChips = document.querySelectorAll('.filter-chip');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const linkedinPostText = document.getElementById('linkedinPostText');
-    const closeModal = document.getElementById('closeModal');
-    const copyPostBtn = document.getElementById('copyPostBtn');
-    const fetchBtn = document.getElementById('fetchBtn');
-
-    let currentFilter = 'all';
-
-    function renderCards() {
-      cardsGrid.innerHTML = '';
-      const query = searchInput.value.toLowerCase();
-      
-      const filtered = opportunities.filter(item => {
-        const matchesFilter = currentFilter === 'all' || item.type === currentFilter;
-        const matchesSearch = item.title.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query);
-        return matchesFilter && matchesSearch;
-      });
-
-      if (filtered.length === 0) {
-        cardsGrid.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">Ничего не найдено</p>';
-        return;
-      }
-
-      filtered.forEach(item => {
-        const card = document.createElement('article');
-        card.className = 'opp-card';
-        card.innerHTML = `
-          <div class="card-top">
-            <span class="badge ${item.type}">${item.typeLabel}</span>
-            <span class="source-tag">🌐 ${item.source}</span>
-          </div>
-          <h2 class="card-title">${item.title}</h2>
-          <p class="card-desc">${item.desc}</p>
-          <div class="card-meta">
-            <span>👤 Возраст: ${item.age}</span>
-            <span>📍 ${item.location}</span>
-          </div>
-          <div class="card-actions">
-            <button class="action-btn secondary-btn" onclick="openPostModal(${item.id})">📲 Пост для LinkedIn</button>
-            <a href="${item.url}" target="_blank" class="action-btn primary-btn">Источник</a>
-          </div>
-        `;
-        cardsGrid.appendChild(card);
-      });
-    }
-
-    window.openPostModal = function(id) {
-      const item = opportunities.find(o => o.id === id);
-      if (!item) return;
-
-      linkedinPostText.value = `📢 ВОЗМОЖНОСТЬ ДЛЯ МОЛОДЕЖИ (16-35 ЛЕТ)\n\n📌 ${item.title}\n\n📍 Локация: ${item.location}\n👥 Возраст: ${item.age}\n🌐 Источник: ${item.source}\n\n📝 Описание:\n${item.desc}\n\n🔗 Ссылка на источник в комментариях или описании.\n\n${item.hashtags} #YouthOpportunities`;
-
-      modalOverlay.style.display = 'flex';
-    };
-
-    filterChips.forEach(chip => {
-      chip.onclick = function() {
-        filterChips.forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
-        currentFilter = this.getAttribute('data-filter');
-        renderCards();
-      };
-    });
-
-    searchInput.oninput = renderCards;
-
-    closeModal.onclick = function() {
-      modalOverlay.style.display = 'none';
-    };
-
-    modalOverlay.onclick = function(e) {
-      if (e.target === modalOverlay) {
-        modalOverlay.style.display = 'none';
-      }
-    };
-
-    copyPostBtn.onclick = function() {
-      linkedinPostText.select();
-      document.execCommand("copy");
-      alert('Текст поста скопирован!');
-      modalOverlay.style.display = 'none';
-    };
-
-    fetchBtn.onclick = function() {
-      alert('Поиск новых вакансий и грантов запущен...');
-    };
-
-    renderCards();
-  </script>
 </body>
 </html>
