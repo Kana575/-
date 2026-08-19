@@ -1,4 +1,3 @@
-// Переменные для хранения данных
 let allOpportunities = [];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -7,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setupUpdateTrigger();
 });
 
-// 1. Загрузка данных из data.json
 async function loadOpportunities() {
     const container = document.getElementById("cards-container");
     try {
@@ -26,7 +24,6 @@ async function loadOpportunities() {
     }
 }
 
-// 2. Отрисовка карточек на странице
 function renderCards(items) {
     const container = document.getElementById("cards-container");
     if (!container) return;
@@ -57,10 +54,9 @@ function renderCards(items) {
     });
 }
 
-// 3. Быстрый поиск и фильтрация по категориям (без перезагрузки страницы)
 function setupSearchAndFilters() {
-    const searchInput = document.querySelector('input[type="text"]') || document.querySelector('.search-input');
-    const filterButtons = document.querySelectorAll('.category-btn, .filter-btn');
+    const searchInput = document.getElementById('search-input');
+    const filterButtons = document.querySelectorAll('.filter-chip');
 
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -78,8 +74,8 @@ function setupSearchAndFilters() {
             filterButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            const category = btn.textContent.trim().toLowerCase();
-            if (category.includes('все')) {
+            const category = btn.dataset.category.toLowerCase();
+            if (category === 'all') {
                 renderCards(allOpportunities);
             } else {
                 const filtered = allOpportunities.filter(item => 
@@ -92,16 +88,14 @@ function setupSearchAndFilters() {
     });
 }
 
-// 4. Логика кнопки "Поиск обновлений"
 function setupUpdateTrigger() {
-    const updateBtn = document.querySelector('.search-btn') || document.querySelector('#update-btn');
+    const updateBtn = document.getElementById('update-btn');
     if (!updateBtn) return;
 
     updateBtn.addEventListener('click', async () => {
-        // Замените на сгенерированный токен
         const token = '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';
         const owner = 'Kana575';
-        const repo = '-'; // Название вашего репозитория на GitHub
+        const repo = '-'; 
 
         updateBtn.disabled = true;
         const originalText = updateBtn.innerText;
@@ -119,9 +113,9 @@ function setupUpdateTrigger() {
             });
 
             if (response.ok) {
-                alert(' Поиск запущен на сервере GitHub! Новые вакансии и гранты появятся на сайте через 1–2 минуты.');
+                alert('Поиск запущен на сервере GitHub! Новые вакансии и гранты появятся на сайте через 1–2 минуты.');
             } else {
-                alert(' Не удалось запустить обновление. Проверьте настройки репозитория.');
+                alert('Не удалось запустить обновление. Проверьте название репозитория в скрипте.');
             }
         } catch (err) {
             console.error(err);
