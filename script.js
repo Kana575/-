@@ -9,19 +9,19 @@ function renderCards(items) {
         return;
     }
 
-    items.forEach(item => {
+    items.forEach((item, index) => {
         const card = document.createElement("article");
         card.className = "card";
 
         const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(item.link)}`;
 
-        // Формируем красивый готовый пост
-        const postText = `📌 ${item.title}\n\n` +
+        // Текст поста
+        const postText = `📌 Новая возможность: ${item.title}\n\n` +
                          `🏢 Организация: ${item.source}\n` +
                          `🏷 Тип: ${item.type.toUpperCase()}\n` +
-                         `📝 ${item.summary}\n\n` +
-                         `🔗 Подробнее: ${item.link}\n\n` +
-                         `#YouthOpportunities #Career #Grants #Jobs`;
+                         `📝 Описание: ${item.summary}\n\n` +
+                         `🔗 Ссылка: ${item.link}\n\n` +
+                         `#YouthOpportunities #Opportunities #Career #Youth`;
 
         card.innerHTML = `
             <div class="card-header">
@@ -33,7 +33,7 @@ function renderCards(items) {
             <div class="card-footer">
                 <span class="date">${item.date}</span>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="btn btn-linkedin" onclick="copyAndOpenLinkedin(\`${encodeURIComponent(postText)}\`, \`${linkedinUrl}\`)">
+                    <button class="btn btn-linkedin" onclick="openLinkedinModal('${encodeURIComponent(postText)}', '${linkedinUrl}')">
                         Пост в LinkedIn
                     </button>
                     <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="btn">Подробнее</a>
@@ -44,57 +44,46 @@ function renderCards(items) {
     });
 }
 
-// Функция копирования в буфер обмена и открытия окна LinkedIn
-function copyAndOpenLinkedin(encodedText, shareUrl) {
+// Показ окна с готовым текстом поста
+function openLinkedinModal(encodedText, shareUrl) {
     const text = decodeURIComponent(encodedText);
 
-    // Копируем текст поста в буфер обмена
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text);
-    } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-    }
+    // Удаляем старое модальное окно, если есть
+    const oldModal = document.getElementById("linkedin-modal");
+    if (oldModal) oldModal.remove();
 
-    // Показываем аккуратное уведомление пользователю
-    showNotification("Текст поста скопирован! Нажмите Ctrl+V в окне LinkedIn.");
+    // Создаем новое модальное окно
+    const modal = document.createElement("div");
+    modal.id = "linkedin-modal";
+    modal.className = "modal-overlay";
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>🔗 Публикация в LinkedIn</h3>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">
+                Скопируйте текст ниже и вставьте его (Ctrl+V) в открывшемся окне LinkedIn:
+            </p>
+            <textarea id="modal-post-text">${text}</textarea>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeLinkedinModal()">Отмена</button>
+                <button class="btn-primary" onclick="copyAndOpenLinkedin('${shareUrl}')">Скопировать и открыть LinkedIn</button>
+            </div>
+        </div>
+    `;
 
-    // Открываем LinkedIn в новом окне через 0.5 сек
-    setTimeout(() => {
-        window.open(shareUrl, '_blank');
-    }, 500);
+    document.body.appendChild(modal);
 }
 
-// Всплывающее уведомление на экране
-function showNotification(message) {
-    let toast = document.getElementById("toast-notification");
-    if (!toast) {
-        toast = document.createElement("div");
-        toast.id = "toast-notification";
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #0a66c2;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            font-size: 0.9rem;
-            font-weight: 500;
-            z-index: 9999;
-            transition: opacity 0.3s ease;
-        `;
-        document.body.appendChild(toast);
-    }
-    toast.innerText = message;
-    toast.style.opacity = "1";
+function closeLinkedinModal() {
+    const modal = document.getElementById("linkedin-modal");
+    if (modal) modal.remove();
+}
 
-    setTimeout(() => {
-        toast.style.opacity = "0";
-    }, 4000);
+function copyAndOpenLinkedin(shareUrl) {
+    const textarea = document.getElementById("modal-post-text");
+    if (textarea) {
+        textarea.select();
+        navigator.clipboard.writeText(textarea.value);
+    }
+    closeLinkedinModal();
+    window.open(shareUrl, '_blank');
 }
