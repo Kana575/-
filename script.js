@@ -1,3 +1,31 @@
+// Базовый список возможностей, если файл data.json недоступен
+const initialData = [
+    {
+        type: "вакансия",
+        source: "ООН",
+        title: "Project Assistant (Youth Opportunities)",
+        summary: "Поддержка молодежных программ, организация семинаров и координация с региональными партнерами.",
+        date: "Август 2026",
+        link: "https://careers.un.org"
+    },
+    {
+        type: "грант",
+        source: "Youth Grants",
+        title: "International Youth Initiative Award 2026",
+        summary: "Грантовая поддержка студенческих и социальных проектов по всему миру.",
+        date: "Август 2026",
+        link: "https://un.org"
+    },
+    {
+        type: "мероприятие",
+        source: "UN Volunteers",
+        title: "Молодежный онлайн-форум по устойчивому развитию",
+        summary: "Серия воркшопов, лекций и нетворкинг-сессий с экспертами международной дипломатии.",
+        date: "Сентябрь 2026",
+        link: "https://unv.org"
+    }
+];
+
 let allOpportunities = [];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -7,22 +35,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadOpportunities() {
-    const container = document.getElementById("cards-container");
     try {
-        // Добавляем timestamp, чтобы браузер не кэшировал старый data.json
-        const response = await fetch("data.json?t=" + new Date().getTime());
-        if (!response.ok) throw new Error("Файл data.json не найден");
-        
+        const response = await fetch("data.json?cache=" + Math.random());
+        if (!response.ok) throw new Error("Файл data.json недоступен");
         allOpportunities = await response.json();
-        renderCards(allOpportunities);
     } catch (error) {
-        console.error("Ошибка загрузки:", error);
-        if (container) {
-            container.innerHTML = `<p style="color: #666; text-align: center; padding: 2rem;">
-                Не удалось загрузить данные. Проверьте валидность data.json.
-            </p>`;
-        }
+        console.warn("Загружен базовый список:", error);
+        allOpportunities = initialData;
     }
+    renderCards(allOpportunities);
 }
 
 function renderCards(items) {
@@ -32,7 +53,7 @@ function renderCards(items) {
     container.innerHTML = "";
 
     if (!items || items.length === 0) {
-        container.innerHTML = `<p style="text-align: center; color: #777; padding: 2rem;">Ничего не найдено</p>`;
+        container.innerHTML = `<p style="text-align: center; color: #777; grid-column: 1/-1; padding: 2rem;">Ничего не найдено</p>`;
         return;
     }
 
@@ -93,6 +114,6 @@ function setupUpdateTrigger() {
     if (!updateBtn) return;
 
     updateBtn.addEventListener('click', () => {
-        alert('Парсер запускается автоматически каждые 6 часов на сервере GitHub Actions.');
+        alert('Обновление выполняется автоматически через GitHub Actions каждый день!');
     });
 }
