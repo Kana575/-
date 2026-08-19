@@ -1,66 +1,37 @@
-document.addEventListener('DOMContentLoaded', () => {
-  let opportunities = [
-    {
-      id: 1,
-      title: "Стажировка в ООН (UN Volunteers)",
-      type: "vacancy",
-      typeLabel: "Вакансия",
-      source: "Официальный сайт ООН",
-      age: "18-35 лет",
-      location: "Гибрид / Международный",
-      desc: "Программа профессиональных стажировок в международных отделах для молодых специалистов.",
-      url: "https://www.un.org",
-      hashtags: "#ООН #Стажировка #Молодежь #Карьера"
-    },
-    {
-      id: 2,
-      title: "Грант на социальные инициативы",
-      type: "grant",
-      typeLabel: "Грант",
-      source: "Международный фонд",
-      age: "16-30 лет",
-      location: "Онлайн",
-      desc: "Финансирование до $5,000 на реализацию образовательных и экологических проектов.",
-      url: "https://www.linkedin.com",
-      hashtags: "#Гранты #МолодежныеИнициативы #Финансирование"
-    },
-    {
-      id: 3,
-      title: "Международный Саммит Лидеров",
-      type: "event",
-      typeLabel: "Мероприятие",
-      source: "LinkedIn / Соцсети",
-      age: "16-35 лет",
-      location: "Вена / Онлайн",
-      desc: "Форум с участием экспертов международных организаций, нетворкинг и воркшопы.",
-      url: "https://www.linkedin.com",
-      hashtags: "#Саммит #Лидерство #Нетворкинг"
-    }
-  ];
+document.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById("cards-container");
 
-  const newIncomingData = [
-    {
-      id: 4,
-      title: "Волонтерская программа UN Migration Survey",
-      type: "vacancy",
-      typeLabel: "Вакансия",
-      source: "UN Volunteers",
-      age: "18-30 лет",
-      location: "Алматы / Полевая работа",
-      desc: "Сбор данных и проведение интервью для социологического исследования миграционных процессов.",
-      url: "https://www.un.org",
-      hashtags: "#ООН #Волонтерство #Алматы #Исследования"
-    },
-    {
-      id: 5,
-      title: "Исследовательский грант по Международным Отношениям",
-      type: "grant",
-      typeLabel: "Грант",
-      source: "Global Academic Policy Hub",
-      age: "18-35 лет",
-      location: "Онлайн / Европа",
-      desc: "Стипендиальная программа на публикацию аналитических материалов о глобальных институтах.",
-      url: "https://www.linkedin.com",
+    // Загрузка JSON, сгенерированного Python-скриптом
+    fetch("data.json")
+        .then(response => {
+            if (!response.ok) throw new Error("Данные еще не созданы");
+            return response.json();
+        })
+        .then(data => {
+            container.innerHTML = "";
+            if (data.length === 0) {
+                container.innerHTML = "<p>Актуальных возможностей пока нет.</p>";
+                return;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement("article");
+                card.className = "card";
+                card.innerHTML = `
+                    <h2>${item.title}</h2>
+                    <p>${item.summary}...</p>
+                    <div class="card-footer">
+                        <span class="date">${item.date}</span>
+                        <a href="${item.link}" target="_blank" class="btn">Подробнее</a>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        })
+        .catch(err => {
+            container.innerHTML = `<p style="color:red;">Запустите Python-скрипт для генерации данных (data.json).</p>`;
+        });
+});      url: "https://www.linkedin.com",
       hashtags: "#Гранты #Аналитика #Дипломатия #МеждународныеОтношения"
     }
   ];
