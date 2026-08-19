@@ -7,35 +7,36 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <header class="navbar">
-        <div class="brand">
-            <span class="logo">🎯</span>
-            <div>
-                <h1>Youth Opportunities Hub</h1>
-                <p>Гранты, вакансии и мероприятия для молодежи (16–35 лет)</p>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🎯</span>
+                <div>
+                    <h1>Youth Opportunities Hub</h1>
+                    <p>Гранты, вакансии и мероприятия для молодежи (16–35 лет)</p>
+                </div>
             </div>
+            <button id="update-btn" class="update-btn">⚡ Поиск обновлений</button>
         </div>
-        <button id="update-btn" class="fetch-btn">⚡ Поиск обновлений</button>
     </header>
 
-    <main class="container">
-        <section class="filter-section">
+    <main class="main-container">
+        <div class="controls">
             <div class="search-box">
-                <input type="text" id="search-input" class="search-input" placeholder="🔍 Поиск по названию или описанию...">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="Поиск по название или описанию...">
             </div>
-            
-            <div class="filter-group">
+            <div class="filters">
                 <button class="filter-chip active" data-category="all">Все</button>
                 <button class="filter-chip" data-category="вакансия">💼 Вакансии</button>
                 <button class="filter-chip" data-category="грант">🎓 Гранты</button>
-                <button class="filter-chip" data-category="мероприятие">🌍 Мероприятия</button>
+                <button class="filter-chip" data-category="мероприятие">🟢 Мероприятия</button>
             </div>
-        </section>
+        </div>
 
-        <section id="cards-container" class="cards-grid">
-            <p class="loading-text">Загрузка актуальных возможностей...</p>
-        </section>
+        <div id="cards-container" class="cards-grid">
+            <!-- Карточки будут вставлены сюда через JS -->
+        </div>
     </main>
 
     <script src="script.js"></script>
