@@ -8,59 +8,32 @@
 </head>
 <body>
     <header>
-        <h1>Global Youth Opportunities Hub</h1>
-        <p>Международные гранты, вакансии и стажировки для молодежи (16–35 лет)</p>
+        <div class="brand">
+            <h1>Youth Opportunities Hub</h1>
+            <p>Гранты, вакансии и мероприятия (16–35 лет)</p>
+        </div>
+        <button id="update-btn" class="search-btn">⚡ Поиск обновлений</button>
     </header>
 
-    <main class="container" id="cards-container">
-        <p class="loading">Загрузка актуальных возможностей...</p>
+    <main class="container">
+        <div class="filter-section">
+            <input type="text" class="search-input" placeholder="Поиск по названию или описанию...">
+            <div class="filter-group">
+                <button class="filter-btn active">Все</button>
+                <button class="filter-btn">💼 Вакансии</button>
+                <button class="filter-btn">🎓 Гранты</button>
+                <button class="filter-btn">🌍 Мероприятия</button>
+            </div>
+        </div>
+
+        <div id="cards-container" class="cards-grid">
+            <!-- Карточки будут загружаться сюда -->
+        </div>
     </main>
 
     <script src="script.js"></script>
 </body>
-</html>      align-items: center;
-      gap: 12px;
-    }
-
-    .logo { font-size: 2rem; }
-    .brand h1 { font-size: 1.2rem; font-weight: 700; }
-    .brand p { font-size: 0.85rem; color: var(--text-muted); }
-
-    .fetch-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 20px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .fetch-btn:hover { background: var(--primary-hover); }
-
-    .filter-section {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .search-box { position: relative; width: 100%; }
-    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-
-    .search-box input {
-      width: 100%;
-      padding: 12px 16px 12px 40px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      outline: none;
-      font-size: 0.95rem;
-    }
-
-    .search-box input:focus { border-color: var(--primary); }
-
-    .filter-group { display: flex; gap: 8px; overflow-x: auto; }
-
+</html>
     .filter-chip {
       background: var(--card-bg);
       border: 1px solid var(--border);
