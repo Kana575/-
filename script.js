@@ -94,8 +94,7 @@ function setupUpdateTrigger() {
     updateBtn.addEventListener('click', async () => {
         const token = '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';
         const owner = 'Kana575';
-        // Укажи здесь точное имя репозитория в GitHub вместо '-'
-        const repo = 'ИМЯ_ТВОЕГО_РЕПОЗИТОРИЯ'; 
+        const repo = 'Kana.news company'; 
 
         updateBtn.disabled = true;
         const originalText = updateBtn.innerText;
@@ -179,8 +178,6 @@ function setupUpdateTrigger() {
 
             if (response.ok) {
                 alert('Поиск запущен на сервере GitHub! Новые вакансии и гранты появятся на сайте через 1–2 минуты.');
-            } else {
-                alert('Не удалось запустить обновление. Проверьте название репозитория в скрипте.');
             }
         } catch (err) {
             console.error(err);
